@@ -234,6 +234,7 @@ namespace screencapture
             }
             catch (Exception ex)
             {
+                LogHelper.CreateLogTxt(ex.Message);
                 return false;
             }
         }

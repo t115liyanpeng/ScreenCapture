@@ -33,6 +33,7 @@ namespace screencapture
             }
             catch (Exception ex)
             {
+                LogHelper.CreateLogTxt(ex.Message);
                 return null;
                 //throw ex; //这里可以定义你自己的异常处理
             }
@@ -56,6 +57,7 @@ namespace screencapture
             }
             catch (Exception ex)
             {
+                LogHelper.CreateLogTxt(ex.Message);
                 return null;
                 //throw ex; //这里可以定义你自己的异常处理
             }
