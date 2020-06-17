@@ -60,19 +60,19 @@ namespace screencapture
             this.ftpURI =new Uri( @"ftp://" + ftpServerIP + "/" + ftpRemotePath + "/");
         }
 
-        ~FTPHelper()
-        {
-            if (response != null)
-            {
-                response.Close();
-                response = null;
-            }
-            if (request != null)
-            {
-                request.Abort();
-                request = null;
-            }
-        }
+        //~FTPHelper()
+        //{
+        //    if (response != null)
+        //    {
+        //        response.Close();
+        //        response = null;
+        //    }
+        //    if (request != null)
+        //    {
+        //        request.Abort();
+        //        request = null;
+        //    }
+        //}
 
         /// <summary>  
         /// 建立FTP链接,返回响应对象  

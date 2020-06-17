@@ -68,6 +68,7 @@ namespace screencapture
 
             txt_h.Text = ConfigurationManager.AppSettings["hh"];
             txt_m.Text = ConfigurationManager.AppSettings["mm"];
+            txtTime.Text= ConfigurationManager.AppSettings["captime"];
             chk_reatart.Checked = bool.Parse(ConfigurationManager.AppSettings["autorestart"]);
             if (chk_reatart.Checked)
             {
@@ -133,45 +134,71 @@ namespace screencapture
             //clock.Stop();
             //startSingle.WaitOne();
             clock.Change(-1, 0);
-            foreach (var config in Configs)
+            for (int i = 0; i < Configs.Count; i++)
             {
-
-                CaptureImgAndSave(config.Width, config.Heigth, config.Sx, config.Sy, config.LocalImgPath);
-                LogHelper.CreateLogTxt("---->capture " + config.SaveName + " img success");
+                CaptureImgAndSave(Configs[i].Width, Configs[i].Heigth, Configs[i].Sx, Configs[i].Sy, Configs[i].LocalImgPath);
+                LogHelper.CreateLogTxt("---->capture " + Configs[i].SaveName + " img success");
                 if (ziplevel > 0)
                 {
                     //压缩
-                    zip.GetPicThumbnail(config.LocalImgPath, config.LocalImgPath, config.Heigth, config.Width,
+                    zip.GetPicThumbnail(Configs[i].LocalImgPath, Configs[i].LocalImgPath, Configs[i].Heigth, Configs[i].Width,
                         ziplevel);
                 }
 
                 #region re send
-                int send = 0;
-                while (!UploadPictureToFtp(config.FtpAddress, config.Username, config.Password, config.FtpPath,
-                    config.LocalImgPath))
-                {
-                    if (send == 3)
-                    {
-                        break;
-                    }
-                    LogHelper.CreateLogTxt($"上传图片{config.LocalImgPath}第{send + 1}次失败！");
-                    send++;
-                }
+                //int send = 0;
+                //while (!UploadPictureToFtp(Configs[i].FtpAddress, Configs[i].Username, Configs[i].Password, Configs[i].FtpPath,
+                //    Configs[i].LocalImgPath))
+                //{
+                //    if (send == 3)
+                //    {
+                //        break;
+                //    }
+                //    LogHelper.CreateLogTxt($"上传图片{Configs[i].LocalImgPath}第{send + 1}次失败！");
+                //    send++;
+                //}
 
-                if (send == 0 || send < 3)
-                {
-                    LogHelper.CreateLogTxt($"上传图片{config.LocalImgPath}成功");
-                }
+                //if (send == 0 || send < 3)
+                //{
+                //    LogHelper.CreateLogTxt($"上传图片{Configs[i].LocalImgPath}成功");
+                //}
 
-                clock.Change(TimeSpan.FromSeconds(config.TimeSpan), TimeSpan.FromSeconds(1));
+                //clock.Change(TimeSpan.FromSeconds(config.TimeSpan), TimeSpan.FromSeconds(config.TimeSpan));
                 //startSingle.Set();
                 //clock.Start();
 
                 #endregion
 
+                string remote = string.Empty;
 
+                if (!string.IsNullOrEmpty(Configs[i].FtpPath))
+                {
+                    remote = $"{Configs[i].FtpPath}/{Configs[i].SaveName}";
+                }
+                else
+                {
+                    remote = Configs[i].SaveName;
+                }
+
+                int send = 0;
+                while (!FluentFtpHelp.FluentFtpUpLoad(Configs[i].FtpAddress, Configs[i].Username, Configs[i].Password, Configs[i].LocalImgPath,
+                    remote))
+                {
+                    if (send == 3)
+                    {
+                        break;
+                    }
+                    LogHelper.CreateLogTxt($"上传图片{Configs[i].LocalImgPath}第{send + 1}次失败！");
+                    send++;
+                }
+
+                if (send == 0 || send < 3)
+                {
+                    LogHelper.CreateLogTxt($"上传图片{Configs[i].LocalImgPath}成功");
+                }
             }
-           
+            clock.Change(TimeSpan.FromSeconds(int.Parse(txtTime.Text)), TimeSpan.FromSeconds(1));
+
         }
 
         private void btnStop_Click(object sender, EventArgs e)
@@ -214,9 +241,17 @@ namespace screencapture
         {
             if (dgv_config.RowCount > 0)
             {
-
-                clock = new System.Threading.Timer(clock_Tick, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
-                SetControl(false);
+                int time = 20;
+                if (int.TryParse(txtTime.Text, out time))
+                {
+                    clock = new System.Threading.Timer(clock_Tick, null, TimeSpan.FromSeconds(1),
+                        TimeSpan.FromSeconds(time));
+                    SetControl(false);
+                }
+                else
+                {
+                    MessageBox.Show("截屏间隔时间不正确！");
+                }
             }
             else
             {

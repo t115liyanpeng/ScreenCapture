@@ -574,7 +574,7 @@
             this.MaximizeBox = false;
             this.Name = "ScreenCapture";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "定时抓屏软件1.2.2";
+            this.Text = "定时抓屏软件1.2.4";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ScreenCapture_FormClosing);
             this.Load += new System.EventHandler(this.ScreenCapture_Load);
             this.cmsNotify.ResumeLayout(false);

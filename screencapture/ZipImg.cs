@@ -106,7 +106,7 @@ namespace screencapture
             }
             catch(Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                LogHelper.CreateLogTxt(ex.Message);
                 return false;
             }
             finally
